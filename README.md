@@ -1,55 +1,65 @@
-[README_Tattle_Tale.md](https://github.com/user-attachments/files/28162770/README_Tattle_Tale.md)
+[README_updated_dash_img.md](https://github.com/user-attachments/files/28163060/README_updated_dash_img.md)
 # Tattle Tale Analytics Dashboard
 
-A Flask-based website and analytics dashboard built for **Tattle Tale**, a Sheffield, UK art community platform focused on creative workshops, community storytelling, and intergenerational participation.
+A Flask and Plotly analytics dashboard built for **Tattle Tale**, a Sheffield, UK art community platform focused on creative workshops, community storytelling, and intergenerational participation.
 
 The project combines a public-facing community website with a protected admin analytics dashboard. The dashboard uses synthetic, deterministic data to demonstrate community growth, workshop participation, survey insights, engagement trends, and content performance.
 
-![Tattle Tale Analytics Dashboard](docs/screenshots/dashboard-overview.png)
+![Tattle Tale Analytics Dashboard](dash_img/Screenshot%202026-05-12%20162036.png)
 
 ---
 
 ## Project Highlights
 
-- Public website pages for the Tattle Tale art community
+- Public-facing website pages for the Tattle Tale art community
 - Protected admin dashboard with session-based login
 - Interactive Plotly analytics dashboard
 - Community survey, contact, and feedback form endpoints
 - Email delivery support through Flask-Mail and SMTP
 - Event booking page with Ticket Tailor integration
-- Responsive frontend pages with custom CSS polish
+- Responsive frontend pages with custom CSS styling
 - Synthetic analytics data for demo and presentation use
 - Passenger WSGI entry point for shared-hosting deployment
 
 ---
 
-## Preview
+## Dashboard Preview
 
 ### Dashboard Overview
 
-![Dashboard Overview](docs/screenshots/dashboard-overview.png)
+![Dashboard Overview](dash_img/Screenshot%202026-05-12%20162036.png)
 
-### Community Engagement Trends
+### Analytics View 1
 
-![Daily Engagement Trends](docs/charts/engagement-trends.png)
+![Analytics View 1](dash_img/Screenshot%202026-05-12%20162046.png)
 
-### Community Growth
+### Analytics View 2
 
-![Community Growth](docs/charts/community-growth.png)
+![Analytics View 2](dash_img/Screenshot%202026-05-12%20162053.png)
 
-### Workshop Performance
+### Analytics View 3
 
-![Workshop Performance](docs/charts/workshop-performance.png)
+![Analytics View 3](dash_img/Screenshot%202026-05-12%20162102.png)
 
-### Discovery Channels
+### Analytics View 4
 
-![Discovery Channels](docs/charts/discovery-channels.png)
+![Analytics View 4](dash_img/Screenshot%202026-05-12%20162110.png)
 
-### Brand / Website Visuals
+### Analytics View 5
 
-![Tattle Tale Artwork](docs/screenshots/homepage-artwork.png)
+![Analytics View 5](dash_img/Screenshot%202026-05-12%20162117.png)
 
-![Workshop Preview](docs/screenshots/workshop-preview.png)
+### Analytics View 6
+
+![Analytics View 6](dash_img/Screenshot%202026-05-12%20162126.png)
+
+### Analytics View 7
+
+![Analytics View 7](dash_img/Screenshot%202026-05-12%20162142.png)
+
+### Analytics View 8
+
+![Analytics View 8](dash_img/Screenshot%202026-05-12%20162153.png)
 
 ---
 
@@ -62,19 +72,19 @@ The project combines a public-facing community website with a protected admin an
 | Styling | CSS, responsive design, Wix-exported page assets |
 | Analytics | Plotly, synthetic Python data generators |
 | Email | Flask-Mail, SMTP, python-dotenv |
-| Auth | Flask session-based demo login |
+| Authentication | Flask session-based demo login |
 | Deployment | Passenger WSGI / shared hosting compatible |
 
 ---
 
 ## Main Features
 
-### 1. Public Community Website
+### Public Community Website
 
 The project includes public pages for:
 
 - Homepage
-- About Lana / founder story
+- About / founder story
 - Tattle Tale story page
 - Workshop chapters
 - Event booking
@@ -82,7 +92,7 @@ The project includes public pages for:
 - FAQ
 - Privacy policy
 
-### 2. Analytics Dashboard
+### Analytics Dashboard
 
 The dashboard contains:
 
@@ -97,7 +107,7 @@ The dashboard contains:
 - Content performance table
 - Workshop details table
 
-### 3. Forms and Email Workflows
+### Forms and Email Workflows
 
 The backend supports:
 
@@ -107,9 +117,9 @@ The backend supports:
 
 Submissions are formatted and sent by email using Flask-Mail. No local database is required for form storage.
 
-### 4. Synthetic Analytics Data
+### Synthetic Analytics Data
 
-The analytics module uses deterministic synthetic data generated in Python. This makes the dashboard suitable for demonstration, portfolio, stakeholder presentation, and development without exposing real user data.
+The analytics module uses deterministic synthetic data generated in Python. This makes the dashboard suitable for demonstrations, portfolio use, stakeholder presentations, and development without exposing real community data.
 
 ---
 
@@ -120,31 +130,40 @@ The analytics module uses deterministic synthetic data generated in Python. This
 ├── app.py
 ├── passenger_wsgi.py
 ├── requirements.txt
+├── README.md
+├── LICENSE
 ├── .env.example
 ├── .gitignore
+├── dash_img/
+│   ├── Screenshot 2026-05-12 162036.png
+│   ├── Screenshot 2026-05-12 162046.png
+│   ├── Screenshot 2026-05-12 162053.png
+│   ├── Screenshot 2026-05-12 162102.png
+│   ├── Screenshot 2026-05-12 162110.png
+│   ├── Screenshot 2026-05-12 162117.png
+│   ├── Screenshot 2026-05-12 162126.png
+│   ├── Screenshot 2026-05-12 162142.png
+│   └── Screenshot 2026-05-12 162153.png
 ├── dashboard/
 │   ├── __init__.py
 │   ├── charts.py
 │   ├── dashboard_routes.py
 │   └── synthetic_data.py
-├── templates/
-│   ├── index.html
-│   ├── login.html
-│   ├── dashboard.html
-│   ├── event-booking.html
-│   ├── community-survey.html
-│   ├── about-lana.html
-│   ├── faq.html
-│   ├── privacy-policy.html
-│   └── ...
 ├── static/
 │   ├── css/
 │   ├── images/
 │   ├── js/
 │   └── videos/
-└── docs/
-    ├── screenshots/
-    └── charts/
+└── templates/
+    ├── index.html
+    ├── login.html
+    ├── dashboard.html
+    ├── event-booking.html
+    ├── community-survey.html
+    ├── about-lana.html
+    ├── faq.html
+    ├── privacy-policy.html
+    └── ...
 ```
 
 ---
@@ -154,8 +173,8 @@ The analytics module uses deterministic synthetic data generated in Python. This
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/tattle-tale-analytics-dashboard.git
-cd tattle-tale-analytics-dashboard
+git clone https://github.com/mandaarrrr/Tattle-Tale-Analytics-Dashboard.git
+cd Tattle-Tale-Analytics-Dashboard
 ```
 
 ### 2. Create a virtual environment
@@ -182,7 +201,7 @@ pip install -r requirements.txt
 
 ### 4. Create your environment file
 
-Copy the example file:
+Copy the example environment file:
 
 ```bash
 cp .env.example .env
@@ -201,7 +220,7 @@ MAIL_TO=recipient@example.com
 SECRET_KEY=change-this-secret-key
 ```
 
-Do not commit `.env` to GitHub.
+Do **not** commit `.env` to GitHub.
 
 ### 5. Run the application
 
@@ -236,7 +255,7 @@ After login, the dashboard is available at:
 http://localhost:5000/dashboard/
 ```
 
-For production, replace the demo login with secure authentication, password hashing, role management, and proper access control.
+For production use, replace the demo login with secure authentication, password hashing, role management, and proper access control.
 
 ---
 
@@ -262,7 +281,7 @@ For production, replace the demo login with secure authentication, password hash
 
 ## Deployment Notes
 
-This project includes `passenger_wsgi.py`, making it suitable for Passenger-based shared hosting environments such as GoDaddy Python hosting.
+This project includes `passenger_wsgi.py`, making it suitable for Passenger-based shared hosting environments.
 
 Before deployment:
 
@@ -271,34 +290,7 @@ Before deployment:
 3. Confirm the correct Python version is selected on the host.
 4. Install dependencies from `requirements.txt`.
 5. Replace demo authentication before using the dashboard with real admin data.
-6. Check email sending with your SMTP provider.
-
----
-
-## GitHub Push Guide
-
-From the project root:
-
-```bash
-git init
-git add .
-git commit -m "Initial commit: Tattle Tale analytics dashboard"
-git branch -M main
-git remote add origin https://github.com/YOUR-USERNAME/tattle-tale-analytics-dashboard.git
-git push -u origin main
-```
-
-Recommended files to avoid committing:
-
-```text
-.env
-venv/
-__pycache__/
-*.pyc
-.DS_Store
-```
-
-These are already covered in `.gitignore`.
+6. Test email delivery with your SMTP provider.
 
 ---
 
@@ -312,6 +304,8 @@ This repository should not include:
 - Virtual environment folders
 - Python cache files
 - Private user or community data
+
+Only `.env.example` should be committed. The real `.env` file should stay local and private.
 
 The included dashboard data is synthetic and generated for demonstration purposes.
 
