@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Tattle Tale Art Community Analytics Dashboard — Track community growth, free workshop participation, engagement, and community impact insights.">
+    <title>Analytics Dashboard — Tattle Tale</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Plotly.js CDN -->
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js" charset="utf-8"></script>
+
+    <style>
+        /* ===== CSS Custom Properties (Design Tokens) ===== */
+        :root {
+            --bg-base: #0B0D14;
+            --bg-surface: #0F1117;
+            --bg-card: #1A1D2E;
+            --bg-card-hover: #222640;
+            --bg-elevated: #242738;
+
+            --primary: #6C63FF;
+            --primary-glow: rgba(108, 99, 255, 0.35);
+            --secondary: #00D9A6;
+            --secondary-glow: rgba(0, 217, 166, 0.25);
+            --accent: #FF6B8A;
+            --warning: #FFB74D;
+            --info: #4FC3F7;
+            --purple-light: #A78BFA;
+
+            --text-primary: #E8E8F0;
+            --text-secondary: #9CA3AF;
+            --text-muted: #6B7280;
+
+            --border: #2D3148;
+            --border-hover: #4B5079;
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+            --shadow-glow: 0 0 30px var(--primary-glow);
+
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ===== Reset & Base ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Subtle animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 600px 400px at 15% 20%, rgba(108,99,255,0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 500px 350px at 85% 75%, rgba(0,217,166,0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 400px 300px at 50% 50%, rgba(255,107,138,0.04) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ===== Top Navigation Bar ===== */
+        .dashboard-topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            height: 64px;
+            background: rgba(15, 17, 23, 0.85);
+            backdrop-filter: blur(20px) saturate(1.4);
+            -webkit-backdrop-filter: blur(20px) saturate(1.4);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .topbar-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+            color: #fff;
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .topbar-title {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .topbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .topbar-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .topbar-nav a:hover, .topbar-nav a.active {
+            color: var(--text-primary);
+            background: var(--bg-card);
+        }
+
+        .topbar-nav a.active {
+            background: linear-gradient(135deg, rgba(108,99,255,0.2), rgba(0,217,166,0.1));
+            border: 1px solid rgba(108,99,255,0.3);
+        }
+
+        .topbar-badge {
+            background: var(--secondary);
+            color: #0B0D14;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 99px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== Main Layout ===== */
+        .dashboard-wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 28px 32px 60px;
+        }
+
+        /* ===== Dashboard Header ===== */
+        .dashboard-header {
+            margin-bottom: 32px;
+        }
+
+        .dashboard-header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+
+        .dashboard-header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .header-accent {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ===== KPI Cards Grid ===== */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 36px;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+            cursor: default;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            transition: var(--transition);
+        }
+
+        .kpi-card:nth-child(1)::before { background: linear-gradient(90deg, var(--primary), var(--purple-light)); }
+        .kpi-card:nth-child(2)::before { background: linear-gradient(90deg, var(--secondary), #34D399); }
+        .kpi-card:nth-child(3)::before { background: linear-gradient(90deg, var(--accent), #F472B6); }
+        .kpi-card:nth-child(4)::before { background: linear-gradient(90deg, var(--warning), #FBBF24); }
+        .kpi-card:nth-child(5)::before { background: linear-gradient(90deg, var(--info), #60A5FA); }
+
+        .kpi-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .kpi-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .kpi-card:nth-child(1) .kpi-icon { background: rgba(108,99,255,0.15); }
+        .kpi-card:nth-child(2) .kpi-icon { background: rgba(0,217,166,0.15); }
+        .kpi-card:nth-child(3) .kpi-icon { background: rgba(255,107,138,0.15); }
+        .kpi-card:nth-child(4) .kpi-icon { background: rgba(255,183,77,0.15); }
+        .kpi-card:nth-child(5) .kpi-icon { background: rgba(79,195,247,0.15); }
+
+        .kpi-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            margin-bottom: 8px;
+        }
+
+        .kpi-card:nth-child(1) .kpi-value { color: var(--primary); }
+        .kpi-card:nth-child(2) .kpi-value { color: var(--secondary); }
+        .kpi-card:nth-child(3) .kpi-value { color: var(--accent); }
+        .kpi-card:nth-child(4) .kpi-value { color: var(--warning); }
+        .kpi-card:nth-child(5) .kpi-value { color: var(--info); }
+
+        .kpi-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 99px;
+        }
+
+        .kpi-change.positive {
+            background: rgba(0,217,166,0.12);
+            color: var(--secondary);
+        }
+
+        .kpi-change.neutral {
+            background: rgba(79,195,247,0.12);
+            color: var(--info);
+        }
+
+        /* ===== Chart Section Grid ===== */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 36px;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            transition: var(--transition);
+            overflow: hidden;
+        }
+
+        .chart-card:hover {
+            border-color: var(--border-hover);
+            box-shadow: var(--shadow-md);
+        }
+
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .chart-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .chart-card-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chart-card-tag {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 99px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(108,99,255,0.15);
+            color: var(--primary);
+        }
+
+        /* ===== Data Table ===== */
+        .data-table-wrapper {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 36px;
+            overflow-x: auto;
+        }
+
+        .data-table-wrapper h3 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table thead th {
+            text-align: left;
+            padding: 12px 16px;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .data-table tbody td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(45, 49, 72, 0.5);
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .data-table tbody tr {
+            transition: var(--transition);
+        }
+
+        .data-table tbody tr:hover {
+            background: var(--bg-elevated);
+        }
+
+        .data-table tbody tr:hover td {
+            color: var(--text-primary);
+        }
+
+        .table-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .table-badge.high { background: rgba(0,217,166,0.15); color: var(--secondary); }
+        .table-badge.medium { background: rgba(255,183,77,0.15); color: var(--warning); }
+        .table-badge.low { background: rgba(255,107,138,0.15); color: var(--accent); }
+
+        /* ===== Footer ===== */
+        .dashboard-footer {
+            text-align: center;
+            padding: 32px 0 16px;
+            color: var(--text-muted);
+            font-size: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .dashboard-footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 1024px) {
+            .charts-grid { grid-template-columns: 1fr; }
+            .dashboard-wrapper { padding: 20px 16px 40px; }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-topbar { padding: 0 16px; }
+            .topbar-nav { display: none; }
+            .kpi-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .kpi-value { font-size: 24px; }
+            .kpi-card { padding: 18px; }
+            .dashboard-header h1 { font-size: 22px; }
+        }
+
+        @media (max-width: 480px) {
+            .kpi-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ===== Animations ===== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .kpi-card, .chart-card, .data-table-wrapper {
+            animation: fadeInUp 0.5s ease-out both;
+        }
+
+        .kpi-card:nth-child(1) { animation-delay: 0.05s; }
+        .kpi-card:nth-child(2) { animation-delay: 0.1s; }
+        .kpi-card:nth-child(3) { animation-delay: 0.15s; }
+        .kpi-card:nth-child(4) { animation-delay: 0.2s; }
+        .kpi-card:nth-child(5) { animation-delay: 0.25s; }
+
+        .chart-card:nth-child(1) { animation-delay: 0.3s; }
+        .chart-card:nth-child(2) { animation-delay: 0.35s; }
+        .chart-card:nth-child(3) { animation-delay: 0.4s; }
+        .chart-card:nth-child(4) { animation-delay: 0.45s; }
+        .chart-card:nth-child(5) { animation-delay: 0.5s; }
+        .chart-card:nth-child(6) { animation-delay: 0.55s; }
+        .chart-card:nth-child(7) { animation-delay: 0.6s; }
+
+        /* ===== Plotly overrides — force responsive inside cards ===== */
+        .chart-card .js-plotly-plot,
+        .chart-card .plotly {
+            width: 100% !important;
+        }
+
+        /* ===== Scrollbar ===== */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-surface); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+    </style>
+</head>
+<body>
+
+    <!-- ===== Top Navigation Bar ===== -->
+    <nav class="dashboard-topbar" id="dashboard-topbar">
+        <div class="topbar-brand">
+            <div class="topbar-logo">TT</div>
+            <span class="topbar-title">Tattle Tale Analytics</span>
+        </div>
+        <div class="topbar-nav">
+            <a href="/" id="nav-home">Home</a>
+            <a href="/dashboard" class="active" id="nav-dashboard">Dashboard</a>
+            <a href="/community-survey" id="nav-survey">Survey</a>
+            <a href="/event-booking" id="nav-events">Events</a>
+            <span class="topbar-badge">Live Data</span>
+            {% if session.get('admin_email') %}
+            <span style="color:var(--text-secondary);font-size:12px;margin-left:8px;">{{ session['admin_email'] }}</span>
+            {% endif %}
+            <a href="/logout" id="nav-logout" style="color:var(--accent);margin-left:8px;font-weight:600;">Logout</a>
+        </div>
+    </nav>
+
+    <!-- ===== Main Content ===== -->
+    <main class="dashboard-wrapper">
+
+        <!-- Header -->
+        <header class="dashboard-header" id="dashboard-header">
+            <h1>Community <span class="header-accent">Analytics</span></h1>
+            <p>Real-time insights for the Tattle Tale art community — Last updated: {{ now if now else "just now" }}</p>
+        </header>
+
+        <!-- ===== KPI Cards ===== -->
+        <section class="kpi-grid" id="kpi-section">
+            <div class="kpi-card" id="kpi-members">
+                <div class="kpi-icon">👥</div>
+                <div class="kpi-label">Total Community Members</div>
+                <div class="kpi-value">{{ "{:,}".format(kpis.total_members) }}</div>
+                <span class="kpi-change positive">▲ Growing community reach</span>
+            </div>
+            <div class="kpi-card" id="kpi-active">
+                <div class="kpi-icon">🎨</div>
+                <div class="kpi-label">Active Participants</div>
+                <div class="kpi-value">{{ "{:,}".format(kpis.active_members) }}</div>
+                <span class="kpi-change positive">▲ Strong monthly engagement</span>
+            </div>
+            <div class="kpi-card" id="kpi-workshops">
+                <div class="kpi-icon">🖌️</div>
+                <div class="kpi-label">Free Workshops Delivered</div>
+                <div class="kpi-value">{{ kpis.workshops_hosted }}</div>
+                <span class="kpi-change neutral">Free access maintained</span>
+            </div>
+            <div class="kpi-card" id="kpi-support">
+                <div class="kpi-icon">🤝</div>
+                <div class="kpi-label">Community Support Hours</div>
+                <div class="kpi-value">{{ "{:,}".format(kpis.community_support_hours) }}</div>
+                <span class="kpi-change positive">▲ Volunteer and partner support</span>
+            </div>
+            <div class="kpi-card" id="kpi-surveys">
+                <div class="kpi-icon">📊</div>
+                <div class="kpi-label">Community Feedback Received</div>
+                <div class="kpi-value">{{ "{:,}".format(kpis.survey_responses) }}</div>
+                <span class="kpi-change neutral">Feedback-led improvement</span>
+            </div>
+        </section>
+
+        <!-- ===== Charts Grid ===== -->
+        <section class="charts-grid" id="charts-section">
+
+            <!-- Engagement (full width) -->
+            <div class="chart-card full-width" id="chart-engagement">
+                <div class="chart-card-header">
+                    <h3>📈 Daily Engagement Trends</h3>
+                    <span class="chart-card-tag">90 Days</span>
+                </div>
+                {{ charts.engagement | safe }}
+            </div>
+
+            <!-- Community Growth Over Time -->
+            <div class="chart-card" id="chart-user-growth">
+                <div class="chart-card-header">
+                    <h3>👥 Community Growth Over Time</h3>
+                    <span class="chart-card-tag">12 Months</span>
+                </div>
+                {{ charts.user_growth | safe }}
+            </div>
+
+            <!-- Community Support Breakdown -->
+            <div class="chart-card" id="chart-support">
+                <div class="chart-card-header">
+                    <h3>🤝 Community Support Breakdown</h3>
+                    <span class="chart-card-tag">12 Months</span>
+                </div>
+                {{ charts.community_support | safe }}
+            </div>
+
+            <!-- Free Workshop Participation -->
+            <div class="chart-card" id="chart-workshops">
+                <div class="chart-card-header">
+                    <h3>🖌️ Free Workshop Participation</h3>
+                    <span class="chart-card-tag">All Time</span>
+                </div>
+                {{ charts.workshops | safe }}
+            </div>
+
+            <!-- Discovery Channels -->
+            <div class="chart-card" id="chart-discovery">
+                <div class="chart-card-header">
+                    <h3>🔍 Discovery Channels</h3>
+                    <span class="chart-card-tag">Survey Data</span>
+                </div>
+                {{ charts.discovery | safe }}
+            </div>
+
+            <!-- Art Medium Interest Distribution -->
+            <div class="chart-card" id="chart-medium">
+                <div class="chart-card-header">
+                    <h3>🎭 Art Medium Interest Distribution</h3>
+                    <span class="chart-card-tag">Survey Data</span>
+                </div>
+                {{ charts.medium_radar | safe }}
+            </div>
+
+            <!-- Participant Feedback Summary -->
+            <div class="chart-card" id="chart-ratings">
+                <div class="chart-card-header">
+                    <h3>⭐ Participant Feedback Summary</h3>
+                    <span class="chart-card-tag">All Responses</span>
+                </div>
+                {{ charts.ratings | safe }}
+            </div>
+
+            <!-- Community Reach by Age Group -->
+            <div class="chart-card full-width" id="chart-age">
+                <div class="chart-card-header">
+                    <h3>📊 Community Reach by Age Group</h3>
+                    <span class="chart-card-tag">All Members</span>
+                </div>
+                {{ charts.age_demographics | safe }}
+            </div>
+
+        </section>
+
+        <!-- ===== Content Performance Table ===== -->
+        <div class="data-table-wrapper" id="content-performance-section">
+            <h3>📄 Content Performance by Page</h3>
+            <table class="data-table" id="content-table">
+                <thead>
+                    <tr>
+                        <th>Page</th>
+                        <th>Views</th>
+                        <th>Avg. Time (sec)</th>
+                        <th>Bounce Rate</th>
+                        <th>Conversions</th>
+                        <th>Performance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for page in content_performance %}
+                    <tr>
+                        <td style="color: var(--text-primary); font-weight: 500;">{{ page.page }}</td>
+                        <td>{{ "{:,}".format(page.views) }}</td>
+                        <td>{{ page.avg_time_sec }}s</td>
+                        <td>{{ page.bounce_rate }}%</td>
+                        <td>{{ page.conversions }}</td>
+                        <td>
+                            {% if page.bounce_rate < 35 %}
+                            <span class="table-badge high">Excellent</span>
+                            {% elif page.bounce_rate < 55 %}
+                            <span class="table-badge medium">Good</span>
+                            {% else %}
+                            <span class="table-badge low">Needs Work</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ===== Workshop Impact Details Table ===== -->
+        <div class="data-table-wrapper" id="workshop-details-section">
+            <h3>🖌️ Workshop Impact Details</h3>
+            <table class="data-table" id="workshop-table">
+                <thead>
+                    <tr>
+                        <th>Workshop</th>
+                        <th>Medium</th>
+                        <th>Enrolled / Capacity</th>
+                        <th>Completion Rate</th>
+                        <th>Community Rating</th>
+                        <th>Free Places Delivered</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ws in workshops %}
+                    <tr>
+                        <td style="color: var(--text-primary); font-weight: 500;">{{ ws.title }}</td>
+                        <td>{{ ws.medium }}</td>
+                        <td>{{ ws.enrolled }} / {{ ws.capacity }}</td>
+                        <td>{{ (ws.completion_rate * 100) | round(0) | int }}%</td>
+                        <td>{{ ws.avg_rating }} ★</td>
+                        <td>{{ ws.free_places_delivered }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+
+    <!-- ===== Footer ===== -->
+    <footer class="dashboard-footer" id="dashboard-footer">
+        <p>Tattle Tale Analytics Dashboard v1.0 · Data is synthetically generated for demonstration ·
+           <a href="/">Back to Home</a></p>
+    </footer>
+
+    <!-- ===== Resize handler for Plotly ===== -->
+    <script>
+        window.addEventListener('resize', function() {
+            document.querySelectorAll('.js-plotly-plot').forEach(function(el) {
+                Plotly.Plots.resize(el);
+            });
+        });
+    </script>
+
+</body>
+</html>
