@@ -1,4 +1,5 @@
-[README_updated_dash_img.md](https://github.com/user-attachments/files/28163060/README_updated_dash_img.md)
+https://www.tatletale.com
+
 # Tattle Tale Analytics Dashboard
 
 A Flask and Plotly analytics dashboard built for **Tattle Tale**, a Sheffield, UK art community platform focused on creative workshops, community storytelling, and intergenerational participation.
